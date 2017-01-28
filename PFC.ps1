@@ -1,5 +1,5 @@
 ####################################################################################################
-#          PORTAL Forensics Collector : V1.5
+#          PORTAL Forensics Collector : V1.6
 # 
 #          EVault
 #                  
@@ -25,6 +25,14 @@
 ####################################################################################################
 
 <#  --------------  Changes History  -----------------
+Version 1.6:
+- Collects Portal's SQL databases also with a SQL Named Instance
+- Collects msinfo32.nfo
+- Collects most recent SQL ERRORLOG
+
+Version 1.5:
+- mostly version number management
+
 Version 1.4:
 - fixing SQL backup when registry path changed to standard one because of a named instance
 
