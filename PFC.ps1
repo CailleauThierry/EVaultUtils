@@ -29,6 +29,10 @@ Version 1.6:
 - Collects Portal's SQL databases also with a SQL Named Instance
 - Collects msinfo32.nfo
 - Collects most recent SQL ERRORLOG
+ Known issues in v 1.6:
+  - scripts can end up deleting collection folder even if .zip file was not generated
+  - sometime the SQL databases are not backed up (SQL 2008 R2)
+  - script is sometimes slow at collecting all the forensics (performance issue)
 
 Version 1.5:
 - mostly version number management
