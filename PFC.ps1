@@ -1,5 +1,5 @@
 ####################################################################################################
-#          PORTAL Forensics Collector : V1.6
+#          PORTAL Forensics Collector : V1.7
 # 
 #          EVault
 #                  
@@ -25,6 +25,10 @@
 ####################################################################################################
 
 <#  --------------  Changes History  -----------------
+Version 1.7:
+- Fixes an issue in the regex filter to indentify the SQL Instance name in order to allow SQL backup, Also on SQL 2008 R2
+- Tested on Portal 8.25 on Windows 2012 R2 Standard running Microsoft SQL Server 2008 R2 (SP2) - 10.50.4000.0 (X64)
+
 Version 1.6:
 - Collects Portal's SQL databases also with a SQL Named Instance
 - Collects msinfo32.nfo
@@ -462,7 +466,9 @@ if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
 	<add key="UserManagement.Sql.Connection" value="Data Source=CLONE1\INSTANCE1;Database=UserManagement;User ID=sa;Password=3Vlt1nc" />
 	#>	
 	
-	$consume = Get-Content $NotificationWebConfig\Web.config | Where-Object { $_ -match 'value\=\"Data Source\=.*\\(?<InstanceName>.*);Database=UserManagement' }
+	$consume = Get-Content $NotificationWebConfig\Web.config | Where-Object { $_ -match "Data Source=.*\\(?<InstanceName>.*)';Database='UserManagement'" }
+
+
 #	'^Full Computer.* (?[^.]+)\.   $matches.computer brucepay64 from "Windows_PowerShell_in_Action_Third_Edit_v11_MEAP.pdf"
 
 	$Instance = $Matches.InstanceName
