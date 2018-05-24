@@ -1,17 +1,17 @@
 ####################################################################################################
 #          PORTAL Forensics Collector : V1.7
-# 
-#          EVault
-#                  
 #
-# gets system information + *.exe.config files 
+#          EVault
+#
+#
+# gets system information + *.exe.config files
 # + web.config files and log files and their respective path
 # + host file + system & application Windows event logs (first 100 warnings and errors)
 # + Portal DBs if requested
 #
 # Result stored in an encrypted zip file on c:\ with the following format :
 #  C:\evaultsupport-ticketnumber-hostname-DATE-TIME.zip
-# 
+#
 # Script can be executed from any mapped drive's folder in a PowerShell session ran as Administrator
 # with Set-ExcecutionPolicy RemoteSigned
 #
@@ -67,16 +67,16 @@ Version 1.1 :
 <#
 	.SYNOPSIS
 		PFC is a PowerShell script that collects system information, exe.config files, web.config files, log files, hosts file, and DBs used with PORTAL application from Seagate CSES (Evault)
-		
+
 	.DESCRIPTION
 		PFC : PORTAL Forensics Collector : V1.2 is a Seagate CSES tool used to collect configuration and sys infos from a PORTAL application server.
 		It has been designed to work on single server install of PORTAL but can be used for distributed installations (you can look at the script to see where it's looking for file and see if you need to modify it to match the distributed installation specifics)
 		Script is asking if the Data Bases should be collected = it gives the option to do not collect them.
-		
+
 	.PARAMETER
 		no parameter
-		
-	.EXAMPLE. 
+
+	.EXAMPLE.
 		Launch the script by typing .\PFC.ps1 in a PowerShell CLI
 
 	.INPUTS
@@ -105,7 +105,7 @@ Version 1.1 :
 # function putting all the files into an encrypted zip file
 function Set-7zaPswd{
 	begin {
-	$password = Read-Host -assecurestring "Please enter the zip's password" 
+	$password = Read-Host -assecurestring "Please enter the zip's password"
 	}
 	process {
 	# runs once per pipeline object
@@ -114,14 +114,14 @@ function Set-7zaPswd{
 	Push-Location
 	$zipdir = Split-Path -Path $currentdir -Parent
 	Set-Location $zipdir
-		
+
 	# here $_ represents the files to compress
 	if (-not (test-path ./7za.exe)) {throw "./7za.exe needed in one directory higher than your current location"}
 	# this is a powershell invokation of the 7z.exe
 	$pswd = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
 	# $_.DirectoryName.Split('\\')[-1] + ".zip" just take the last entry of the directory name an use this as the .zip filename
-	$exicode = & ./7za.exe a -mmt=off  ($_.DirectoryName.Split('\\')[-1] + ".zip") ("-p$pswd") $_.FullName
-	#The Remove-Variable cmdlet takes the name of the variable as a parameter, not the $variable itself 
+	$ConsumeReturnValue = & ./7za.exe a -mmt=off  ($_.DirectoryName.Split('\\')[-1] + ".zip") ("-p$pswd") $_.FullName
+	#The Remove-Variable cmdlet takes the name of the variable as a parameter, not the $variable itself
 	Remove-Variable pswd
     Pop-Location
 	}
@@ -140,7 +140,7 @@ function Get-SQLBackupDirectoryForInstance
 		[Parameter(Position = 1)]
 		[System.String]$Host_Name = 'YourHostName'
 	)
-	
+
 	process
 	{
 		try
@@ -173,7 +173,7 @@ function Get-SQLErrorLogPathForInstance
 		[Parameter(Position = 1)]
 		[System.String]$Host_Name = 'YourHostName'
 	)
-	
+
 	process
 	{
 		try
@@ -197,7 +197,7 @@ function Get-SQLErrorLogPathForInstance
 	}
 }
 
-$Portal = Get-ChildItem
+$ConsumeReturnValue = Get-ChildItem
 $ErrorActionPreference = "SilentlyContinue"
 
 # save the execution path
@@ -231,7 +231,7 @@ $serverhostname = hostname
 Set-Location $execpath
 $Now = get-date -uformat "%Y-%m-%d-%A-%kH%M"
 $MyPath_org = 'evaultsupport-' + $ticketnb + '-' + $serverhostname + '-' + $Now
-$silent = new-item -itemtype directory $MyPath_org 
+$ConsumeReturnValue = new-item -itemtype directory $MyPath_org
 $MyPath = "$execpath" + '\' + "$MyPath_org"
 Set-Location $MyPath
 
@@ -256,7 +256,7 @@ Get-EventLog application -new 100 -entrytype Error,warning | Select-Object * | E
 Write-Output "---INSTALLED APPLICATIONS---" >> PFC.txt
 (Get-WmiObject Win32_Product | Sort-Object Vendor, Name | Format-Table Vendor, Name, Version -groupBy Vendor) >> PFC.txt
 
-if ( $PSVersionTable.PSVersion.Major -ge 4) 
+if ( $PSVersionTable.PSVersion.Major -ge 4)
 {
 	Write-Output "---WINDOWS ROLES AND FEATURES---" >> PFC.txt
 	Get-WindowsFeature | Where-Object installed >> PFC.txt
@@ -429,7 +429,7 @@ else
 if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
 {
 	Write-Output "DB collected" >> PFC.txt
-	
+
 	# SQL DB collect
 	# osql DB backup in order to work with both SQLExpress and SQL Server
 	# note: ` escape character is necessary to make osql PowerShell V2.0 compatible
@@ -441,15 +441,15 @@ if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
 	#	BACKUP DATABASE successfully processed 459 pages in 0.120 seconds (29.874 MB/sec).
 	# note 3: the path "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names" is where you find the different instance names installed on this server
 	# and "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\EVault\InfoStage\Portal\Notification" where Portal SQL server config file is on the SQL back end
-	
+
 #	cd HKLM:
 #	cd \SOFTWARE\Wow6432Node\EVault\InfoStage\
 #	PS HKLM:\SOFTWARE\Wow6432Node\EVault\InfoStage> $Portal
-#	
-#	
+#
+#
 #	Hive: HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\EVault\InfoStage
-#	
-#	
+#
+#
 #	Name                           Property
 #	---- --------
 #   [...]
@@ -460,13 +460,13 @@ if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
 	C:\inetpub\Portal Services Website\Notification
 	#>
 	$NotificationWebConfig = $A.GetValue("NotificationDir")
-	
+
 <#	extract of interest from NotificationWebConfig "Web.config" file
 	>>
 	<add key="UserManagement.Sql.Connection" value="Data Source=CLONE1\INSTANCE1;Database=UserManagement;User ID=sa;Password=3Vlt1nc" />
-	#>	
-	
-	$consume = Get-Content $NotificationWebConfig\Web.config | Where-Object { $_ -match "Data Source=.*\\(?<InstanceName>.*)';Database='UserManagement'" }
+	#>
+
+	$ConsumeReturnValue = Get-Content $NotificationWebConfig\Web.config | Where-Object { $_ -match "Data Source=.*\\(?<InstanceName>.*)';Database='UserManagement'" }
 
 
 #	'^Full Computer.* (?[^.]+)\.   $matches.computer brucepay64 from "Windows_PowerShell_in_Action_Third_Edit_v11_MEAP.pdf"
@@ -476,27 +476,27 @@ if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
 <#	Result of "$Instance = $Matches.InstanceName"
 	Name	Type	Value
 	Instance	String	INSTANCE1#>
-	
-	
-	$consume = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE EVaultWeb TO DISK = 'EVaultWeb.bin'"}
-	$consume = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE SiteManagement TO DISK = 'SiteManagement.bin'"}
-	$consume = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE UserManagement TO DISK = 'UserManagement.bin'"}
-	$consume = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE WebCC TO DISK = 'WebCC.bin'"}
-	$consume = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE VaultReporting TO DISK = 'VaultReporting.bin'"}
 
-	# here we look for the folder where the DB is backed up 
+
+	$ConsumeReturnValue = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE EVaultWeb TO DISK = 'EVaultWeb.bin'"}
+	$ConsumeReturnValue = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE SiteManagement TO DISK = 'SiteManagement.bin'"}
+	$ConsumeReturnValue = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE UserManagement TO DISK = 'UserManagement.bin'"}
+	$ConsumeReturnValue = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE WebCC TO DISK = 'WebCC.bin'"}
+	$ConsumeReturnValue = Invoke-Command -ScriptBlock { osql `-E `-S .\$Instance `-Q"BACKUP DATABASE VaultReporting TO DISK = 'VaultReporting.bin'"}
+
+	# here we look for the folder where the DB is backed up
 <#	$A = reg query "HKLM\Software\Microsoft\Microsoft SQL Server"
 	$B = $A | Where-Object {$_ -like "*MSSQL*" } | Where-Object {$_ -notlike "*MSSQLServer*"}
 	$SQLBackupItems = $B.Replace("HKEY_LOCAL_MACHINE\Software\Microsoft","C:\Program Files") + "\MSSQL\Backup\*.bin"#>
-	
-	
+
+
 	$SQLBackupItems = Get-SQLBackupDirectoryForInstance -InstanceName $Instance
-	
+
 <#	C:\Program Files\Microsoft SQL Server\MSSQL11.INSTANCE1\MSSQL\Backup#>
-	
+
 	# and then copy the DBs to our collect folder
 	Copy-Item -Path $SQLBackupItems -Destination $MyPath -Recurse -Container: $false
-	
+
 	Get-ChildItem $SQLBackupItems | Select-Object -Property FullName | Out-File PFC.txt -Append -NoClobber
 
 }
@@ -520,14 +520,14 @@ $FP = $MyPath + "\*.*"
 # cannot use  (Get-ChildItem $FP).FullName as parenthetical explicit is not supported in PowerShell v 2.0
 Get-ChildItem $FP | Select-Object -Property FullName | Out-File "C:\List_of_files_to_zip.txt"
 ("$MyPath" + "\hosts") | Add-Content "C:\List_of_files_to_zip.txt"
-$reszip = Get-ChildItem (Get-Content "C:\List_of_files_to_zip.txt") | Set-7zaPswd
+$ConsumeReturnValue  = Get-ChildItem (Get-Content "C:\List_of_files_to_zip.txt") | Set-7zaPswd
 Remove-Item "C:\List_of_files_to_zip.txt" -Force
 
 # now deleting all files except the zip file
 Set-Location $MyPath
 
 # making sure "$MyPath" is of type "*evaultsupport*" before deleting it
-if("$MyPath" -like "*evaultsupport*"){ 
+if("$MyPath" -like "*evaultsupport*"){
 # Gets the "*evaultsupport*" and all its content (-Recurse) and deletes it forcibly (without asking user's authorization)
 Get-Item $MyPath | Remove-Item -Recurse -Force
 }
