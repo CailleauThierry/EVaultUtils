@@ -1,10 +1,10 @@
 ####################################################################################################
-#          PORTAL Forensics Collector : V1.7
+#          PORTAL Forensics Collector : V1.8
 #
 #          EVault
 #
 #
-# gets system information + *.exe.config files
+# gets system information  + install/upgrade logs + *.exe.config files
 # + web.config files and log files and their respective path
 # + host file + system & application Windows event logs (first 100 warnings and errors)
 # + Portal DBs if requested
@@ -25,6 +25,10 @@
 ####################################################################################################
 
 <#  --------------  Changes History  -----------------
+Version 1.8 ongoing:
+- Consolidated ununsed return value consuming variables. Linter says "The variable 'ConsumeReturnValue' is assigned but never used. (PSUseDeclaredVarsMoreThanAssignments)" which is expected (already added at end of version 1.7 but not worth changing version number for that)
+- Adding $env:tmp\Setup.log and $env:tmp\Installer-ConfigFileManager.log to Catpure install log available
+
 Version 1.7:
 - Fixes an issue in the regex filter to indentify the SQL Instance name in order to allow SQL backup, Also on SQL 2008 R2
 - Tested on Portal 8.25 on Windows 2012 R2 Standard running Microsoft SQL Server 2008 R2 (SP2) - 10.50.4000.0 (X64)
@@ -301,7 +305,6 @@ if ( $res = Get-ChildItem . -Include web.config -Recurse -Force )
 }
 else
 {
-	Set-Location 'C:\' # this looks redundant but might be a workaround
 	Set-Location $MyPath
 	Write-Output "FOLDER NOT FOUND : C:\inetpub\" >> PFC.txt
 }
@@ -424,6 +427,29 @@ else
 	Set-Location $MyPath
 	Write-Output "FOLDER NOT FOUND : C:\Program Files\" >> PFC.txt
 }
+
+# collects install logs files: $env:tmp\Setup.log and $env:tmp\Installer-ConfigFileManager.log
+$MyPath2 = $env:tmp
+Set-Location $MyPath2
+if ( (Get-Location).Path -eq $MyPath2 )
+{
+	if ( $res = Get-ChildItem -Path .\* -Include Setup.log,Installer-ConfigFileManager.log)
+	{
+		Set-Location $MyPath
+		Write-Output "INSTALL LOGS FILES FOUND:" >> PFC.txt
+		for ($i = 0 ; $i -ne $res.Length ; $i++)
+		{
+			Write-Output ($res[$i] -as [string]) >> PFC.txt
+			Copy-Item ($res[$i] -as [string]) $MyPath
+		}
+	}
+}
+else
+{
+	Set-Location $MyPath
+	Write-Output "FOLDER NOT FOUND : %tmp%" >> PFC.txt
+}
+
 
 #Checking if DB collect has been requested
 if ( $DBcollect -eq "y" -or $DBcollect -eq "Y"  )
