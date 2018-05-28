@@ -2,7 +2,7 @@
 This is a personal list of scripts I use in test environment only. Free free to use them as-is, I know I do.
 
 # How-To use "Portal Forensics Collector" PFC.ps1?
-	
+
 PFC.ps1 is a PowerShell script that collects system information, exe.config files, web.config files, log files, hosts file, and DBs used with PORTAL.
 
 It has been designed to work on single server install of PORTAL but can be used for distributed installation, it will just skip the components it does not find on that server.
@@ -22,11 +22,11 @@ If you choose to collect the DBs it will get the following DBs :
 
      VaultReporting
 
- 
+
 
 Note : this script collects DBs from SQL server or SQL Express.
 
- 
+
 
 This script reads only and stores the collected information into an encrypted zip file on c:\ with the following format :
 
@@ -34,7 +34,7 @@ This script reads only and stores the collected information into an encrypted zi
 
    This Zip file contains a file PFC.txt which contains system info collected and original location of config and log files collected
 
- 
+
 
 How to use the script :
 
@@ -53,9 +53,9 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
 7. After the script execution send us the ZIP file produced
 
- 
 
 
-PFC Current version is : 1.7 You can download the latest version from:
+
+PFC Current version is : 1.8 You can download the latest version from:
 
 https://github.com/CailleauThierry/EVaultUtils > updated versions will be posted here when available
