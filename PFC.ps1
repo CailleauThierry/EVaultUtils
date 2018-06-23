@@ -297,8 +297,8 @@ if ( $res = Get-ChildItem . -Include web.config -Recurse -Force )
 	Write-Output "WEB.CONFIG FILES FOUND:" >> PFC.txt
 	for ($i = 0 ; $i -ne $res.Length ; $i++)
 	{
-		Write-Output ($res[$i] -as [string]) >> PFC.txt
-		$param = ($MyPath + "\web") + ($i -as [string]) + ".config"
+		Write-Output (($res[$i] -as [string]) + "          renamed as: " + "Web.config_" + ($res[$i].DirectoryName.Split('\')[-1]) + "_Web.config") >> PFC.txt
+		$param = ($MyPath + "\") + "Web.config_" + ($res[$i].DirectoryName.Split('\')[-1]) + "_Web.config"
 		Copy-Item ($res[$i] -as [string]) $param
 	}
 }
