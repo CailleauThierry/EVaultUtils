@@ -1,5 +1,5 @@
 ####################################################################################################
-#          PORTAL Forensics Collector : V1.8
+#          PORTAL Forensics Collector : V1.9
 #
 #          EVault
 #
@@ -25,6 +25,9 @@
 ####################################################################################################
 
 <#  --------------  Changes History  -----------------
+Version 1.9:
+- Now changed "renamed as: Web.config_ParentFolder_Web.config" to identify "Web.config" files easier also when sorting them by name or by extension. Example "Web.config_Status_Web.config" from the C:\inetpub\Portal Legacy\Status\Web.config
+
 Version 1.8 ongoing:
 - Consolidated ununsed return value consuming variables. Linter says "The variable 'ConsumeReturnValue' is assigned but never used. (PSUseDeclaredVarsMoreThanAssignments)" which is expected (already added at end of version 1.7 but not worth changing version number for that)
 - Adding $env:tmp\Setup.log and $env:tmp\Installer-ConfigFileManager.log to Catpure install log available
