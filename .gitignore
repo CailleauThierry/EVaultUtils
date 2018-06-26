@@ -1,3 +1,4 @@
 *.psproj
 *.TempPoint.ps1
 *.RestorePoint.ps1
+*.vscode

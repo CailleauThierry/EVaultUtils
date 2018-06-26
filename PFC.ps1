@@ -25,6 +25,10 @@
 ####################################################################################################
 
 <#  --------------  Changes History  -----------------
+Version 1.9.0.1:
+- Introducing new versioning as 2.0 could mean something else for PFC in the future
+- Now collecting log files from C:\Program Files\Carbonite Server Backup\
+
 Version 1.9:
 - Now changed "renamed as: Web.config_ParentFolder_Web.config" to identify "Web.config" files easier also when sorting them by name or by extension. Example "Web.config_Status_Web.config" from the C:\inetpub\Portal Legacy\Status\Web.config
 
@@ -316,8 +320,9 @@ else
 
 # collect Portal log files
 # first in C:\logs
-# then in C:\Program Files\EVault Software
-# then in C:\Program Files (x86)\EVault Software
+# then in C:\Program Files\Carbonite Server Backup\
+# then in legacy C:\Program Files\EVault Software
+# then in legacy C:\Program Files (x86)\EVault Software
 
 $MyPath2 = 'C:\logs'
 Set-Location $MyPath2
@@ -341,26 +346,58 @@ else
 	Write-Output "FOLDER NOT FOUND : C:\logs\" >> PFC.txt
 }
 
-$MyPath2 = 'C:\Program Files\EVault Software'
+$MyPath2 = 'C:\Program Files\Carbonite Server Backup\'
 Set-Location $MyPath2
-if ( (Get-Location).Path -eq $MyPath2 )
+if ( (Get-Location).Path -eq $MyPath2)
 {
 	if ( $res = Get-ChildItem . -Include *.log -Recurse -Force )
 	{
     	Set-Location 'C:\'
 		Set-Location $MyPath
-		Write-Output "LOG FILES FOUND in C:\Program Files\EVault Software\:" >> PFC.txt
+		Write-Output "LOG FILES FOUND in C:\Program Files\Carbonite Server Backup\" >> PFC.txt
 		for ($i = 0 ; $i -ne $res.Length ; $i++)
 		{
 			Write-Output ($res[$i] -as [string]) >> PFC.txt
 			Copy-Item ($res[$i] -as [string]) $MyPath
 		}
 	}
+	else
+	{
+		Set-Location $MyPath
+		Write-Output "LOG FILES NOT FOUND : C:\Program Files\Carbonite Server Backup\" >> PFC.txt
+	}
 }
 else
 {
 	Set-Location $MyPath
-	Write-Output "FOLDER NOT FOUND : C:\Program Files\EVault Software\" >> PFC.txt
+	Write-Output "FOLDER NOT FOUND : C:\Program Files\Carbonite Server Backup\" >> PFC.txt
+}
+
+$MyPath2 = 'C:\Program Files\EVault Software'
+Set-Location $MyPath2
+if ( (Get-Location).Path -eq $MyPath2)
+{
+	if ( $res = Get-ChildItem . -Include *.log -Recurse -Force )
+	{
+    	Set-Location 'C:\'
+		Set-Location $MyPath
+		Write-Output "LOG FILES FOUND legacy C:\Program Files\EVault Software\" >> PFC.txt
+		for ($i = 0 ; $i -ne $res.Length ; $i++)
+		{
+			Write-Output ($res[$i] -as [string]) >> PFC.txt
+			Copy-Item ($res[$i] -as [string]) $MyPath
+		}
+	}
+	else
+	{
+		Set-Location $MyPath
+		Write-Output "LOG FILES NOT FOUND : legacy C:\Program Files\EVault Software\ " >> PFC.txt
+	}
+}
+else
+{
+	Set-Location $MyPath
+	Write-Output "FOLDER NOT FOUND : legacy C:\Program Files\EVault Software\" >> PFC.txt
 }
 
 
@@ -371,18 +408,23 @@ if ( (Get-Location).Path -eq $MyPath2 )
 	if ( $res = Get-ChildItem . -Include *.log -Recurse -Force )
 	{
 		Set-Location $MyPath
-		Write-Output "LOG FILES FOUND in C:\Program Files (x86)\EVault Software\:" >> PFC.txt
+		Write-Output "LOG FILES FOUND in legacy C:\Program Files (x86)\EVault Software\:" >> PFC.txt
 		for ($i = 0 ; $i -ne $res.Length ; $i++)
 		{
 			Write-Output ($res[$i] -as [string]) >> PFC.txt
 			Copy-Item ($res[$i] -as [string]) $MyPath
 		}
 	}
+	else
+	{
+		Set-Location $MyPath
+		Write-Output "LOG FILES NOT FOUND : legacy C:\Program Files (x86)\EVault Software\ Could be a newer Carbonite Portal with no depenencies on 32-bit Programs" >> PFC.txt
+	}
 }
 else
 {
 	Set-Location $MyPath
-	Write-Output "FOLDER NOT FOUND : C:\Program Files (x86)\EVault Software\" >> PFC.txt
+	Write-Output "FOLDER NOT FOUND : legacy C:\Program Files (x86)\EVault Software\" >> PFC.txt
 }
 
 # collect inetpub log files
@@ -432,7 +474,8 @@ else
 }
 
 # collects install logs files: $env:tmp\Setup.log and $env:tmp\Installer-ConfigFileManager.log
-$MyPath2 = $env:tmp
+Set-Location $env:tmp
+$MyPath2 = (Get-Location).Path
 Set-Location $MyPath2
 if ( (Get-Location).Path -eq $MyPath2 )
 {
@@ -446,11 +489,17 @@ if ( (Get-Location).Path -eq $MyPath2 )
 			Copy-Item ($res[$i] -as [string]) $MyPath
 		}
 	}
+	else
+	{
+		Set-Location $MyPath
+		Write-Output "INSTALL LOGS FILES FOUND: niether Setup.log or Installer-ConfigFileManager.log were found in the Windows \Temp folder : $MyPath2" >> PFC.txt
+	}
+
 }
 else
 {
 	Set-Location $MyPath
-	Write-Output "FOLDER NOT FOUND : %tmp%" >> PFC.txt
+	Write-Output "FOLDER NOT FOUND : $MyPath2" >> PFC.txt
 }
 
 
