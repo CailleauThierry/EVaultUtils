@@ -56,6 +56,6 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted
 
 
 
-PFC Current version is : 1.9 You can download the latest version from:
+PFC Current version is : 1.9.0.1 You can download the latest version from:
 
 https://github.com/CailleauThierry/EVaultUtils > updated versions will be posted here when available

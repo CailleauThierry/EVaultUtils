@@ -1,5 +1,5 @@
 ####################################################################################################
-#          PORTAL Forensics Collector : V1.9
+#          PORTAL Forensics Collector : V1.9.0.1
 #
 #          EVault
 #
@@ -247,7 +247,7 @@ $MyPath = "$execpath" + '\' + "$MyPath_org"
 Set-Location $MyPath
 
 date >> PFC.txt   # date the files have been collected + contains the path to files collected
-Write-Output "PORTAL Forensics Collector : V1.6" >> PFC.txt
+Write-Output "PORTAL Forensics Collector : V1.9.0.1" >> PFC.txt
 Write-Output "Script execution path =" $execpath.Path >> PFC.txt # write the execution path
 
 msinfo32.exe /nfo $MyPath\msinfo32.nfo
@@ -289,11 +289,12 @@ Write-Output "---LISTENING PORTS AND ESTABLISHED CONNECTIONS---" >> PFC.txt
 netstat -ano >> PFC.txt
 
 # collect the hosts file
+Write-Output "---COLLECTED hosts file---" >> PFC.txt
 Copy-Item C:\Windows\System32\drivers\etc\hosts $MyPath
+Write-Output "C:\Windows\System32\drivers\etc\hosts" >> PFC.txt
 
 # collect web.config files
 $MyPath2 = 'C:\inetpub'
-
 Set-Location $MyPath2
 if ( (Get-Location).Path -eq $MyPath2 )
 {
@@ -317,8 +318,7 @@ else
 }
 
 
-
-# collect Portal log files
+# Collects Portal log files
 # first in C:\logs
 # then in C:\Program Files\Carbonite Server Backup\
 # then in legacy C:\Program Files\EVault Software
@@ -346,7 +346,7 @@ else
 	Write-Output "FOLDER NOT FOUND : C:\logs\" >> PFC.txt
 }
 
-$MyPath2 = 'C:\Program Files\Carbonite Server Backup\'
+$MyPath2 = 'C:\Program Files\Carbonite Server Backup'
 Set-Location $MyPath2
 if ( (Get-Location).Path -eq $MyPath2)
 {

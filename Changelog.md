@@ -1,3 +1,7 @@
+Added Version 1.9.0.1 on Tuesday June 26, 2018
+----------------------------------------------------------
+- Now also collecting log files from C:\Program Files\Carbonite Server Backup\
+
 Added in Version 1.9 on Sunday June 24, 2018
 ----------------------------------------------------------
 - Now changed "renamed as: Web.config_ParentFolder_Web.config" to identify "Web.config" files easier also when sorting them by name or by extension. Example "Web.config_Status_Web.config" from the C:\inetpub\Portal Legacy\Status\Web.config
